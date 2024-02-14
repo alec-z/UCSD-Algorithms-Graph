@@ -1,15 +1,59 @@
 #include <iostream>
 #include <limits>
-#include <vector>
 #include <queue>
+#include <vector>
 
-using std::vector;
-using std::queue;
 using std::pair;
 using std::priority_queue;
+using std::queue;
+using std::vector;
 
-void shortest_paths(vector<vector<int> > &adj, vector<vector<int> > &cost, int s, vector<long long> &distance, vector<int> &reachable, vector<int> &shortest) {
-  //write your code here
+#define MAX_INT std::numeric_limits<long long>::max()
+#define MIN_INT std::numeric_limits<long long>::min()
+
+void shortest_paths(vector<vector<int> > &adj, vector<vector<int> > &cost,
+                    int s, vector<long long> &distance, vector<int> &reachable,
+                    vector<int> &shortest) {
+  // write your code here
+  int n = adj.size();
+  for (int i = 0; i < n; i++) distance[i] = MAX_INT;
+  distance[s] = 0;
+
+  queue<int> q;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      for (int k = 0; k < adj[j].size(); k++) {
+        int je = adj[j][k];
+        int jw = cost[j][k];
+        if (distance[j] < MAX_INT && distance[j] + jw < distance[je]) {
+          distance[je] = distance[j] + jw;
+          if (i == n - 1) {
+            q.push(je);
+            distance[je] = MIN_INT;
+          }
+        }
+      }
+    }
+  }
+
+  while (!q.empty()) {
+    int v = q.front();
+    q.pop();
+    for (int w: adj[v]) {
+      if (distance[w] != MIN_INT) {
+        q.push(w);
+        distance[w] = MIN_INT;
+      }
+    }
+  }
+  for (int i = 0; i < n; i++) {
+    if (distance[i] != MAX_INT) {
+      reachable[i] = 1;
+    }
+    if (distance[i] == MIN_INT || distance[i] == MAX_INT) {
+      shortest[i] = 0;
+    }
+  }
 }
 
 int main() {
